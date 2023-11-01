@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fdf.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
+/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 15:17:11 by dayou             #+#    #+#             */
-/*   Updated: 2023/10/31 15:36:59 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/01 18:00:10 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include <stdio.h> //perror
 # include <unistd.h>
 # include <fcntl.h>
-# include <mlx.h> // make 같이 하는데 필요할까?
+# include "./mlx/mlx.h" // make 같이 하는데 필요할까?
 # include <math.h>
 
 // typedef enum e_status

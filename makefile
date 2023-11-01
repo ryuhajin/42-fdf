@@ -5,7 +5,7 @@ CC = cc
 # 2번 방법 : 실행파일과 같은 경로에 libmlx.dyld를 옮기기
 # make -C mlx 다음 줄에 "cp libmlx.dyld ." 추가
 
-# SANITIZE = -fsanitize=address
+SANITIZE = -fsanitize=address
 CFLAG = -Wall -Werror -Wextra -g $(SANITIZE)
 
 NAME = fdf
@@ -13,8 +13,6 @@ NAME = fdf
 SRCS = main.c \
 
 OBJS = $(SRCS:.c=.o)
-
-OBJS_BONUS = $(SRCS_BONUS:.c=.o)
 
 MLX_DIR = ./mlx
 
@@ -30,7 +28,6 @@ $(NAME) : $(OBJS)
 
 clean : 
 		rm -rf $(OBJS)
-		rm -rf $(OBJS_BONUS)
 		rm -rf libmlx.dylib
 		make clean -C $(MLX_DIR)
 
