@@ -10,7 +10,7 @@ CFLAG = -Wall -Werror -Wextra -g $(SANITIZE)
 
 NAME = fdf
 
-SRCS = main.c \
+SRCS = main.c line.c
 
 OBJS = $(SRCS:.c=.o)
 

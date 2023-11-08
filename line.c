@@ -3,25 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   line.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
+/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 21:21:35 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/01 20:46:59 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/08 22:03:19 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-int line_use_bresenham (int start_x, int start_y, int end_x, int end_y)
+void line_draw (int x1, int y1, int x2, int y2, t_img * img, int color)
 {
-	// 높이와 가로는 0과 1 사이
-	int x = start_x;
-	int y = start_y;
-
-	//높이와 가로를 구한다
-	int w = end_x - start_x;
-	int h = end_y - start_y;
-
-	//직선을 어디다 그을지 초기값 판별식
-	int determine = 2 * h - w;
+	float delta_x = x2 - x1; //x 변화량
+	float delta_y = y2 - y1; //y 변화량
+	float slope;
+	float origin_y1;
+	slope = delta_y / delta_x;
+	origin_y1 = y1;
+	while(x1 <= x2) // x1이 x2보다 작을수도 있다 <- 이 경우 생각하기
+	{
+		img_pix_put(img, x1, y1, color);
+		x1++;
+		origin_y1 += slope;
+		y1 = roundf(origin_y1);
+	}
 }
