@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fdf.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
+/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 15:17:11 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/08 21:47:27 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/14 00:48:50 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,34 @@
 # include <stdio.h> //perror
 # include <unistd.h>
 # include <fcntl.h>
-# include "./mlx/mlx.h" // make 같이 하는데 필요할까?
+# include "./mlx/mlx.h"
+# include "./libft/libft.h"
 # include <math.h>
 
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 1024
+# endif
+# ifndef OPEN_MAX
+#  define OPEN_MAX 1024
+# endif
+
+typedef enum e_status
+{
+	failed = -1,
+	success = 0
+}			t_status;
+typedef enum e_read_status
+{
+	read_failed = -1,
+	read_EOF = 0,
+}			t_read_status;
+
+typedef enum e_new_line_status
+{
+	no_new_line = 0,
+	make_new_line = 1,
+	line_malloc_failed = 2
+}			t_make_line_status;
 typedef struct s_img
 {
 	void * mlx_img; //mlx_img 는 mlx_new_image 함수가 반환하는 주소를 참조한다.
@@ -37,6 +62,20 @@ typedef struct s_data
 	void * win_ptr;
 	t_img img;
 } t_data;
+
+typedef struct s_list
+{
+	void * content; // (t_list *) list, (char *)value, (int *)value
+	struct s_list *next;
+}				t_list;
+
+typedef struct s_init
+{
+	void * mlx;
+	t_data * data;
+	t_img * img;
+	t_list * list;
+}	t_init;
 
 void render_background (t_img * img, int color);
 int	render(t_data *data, int x1, int x2, int y1, int y2, int color);

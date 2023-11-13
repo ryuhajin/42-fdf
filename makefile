@@ -16,11 +16,14 @@ OBJS = $(SRCS:.c=.o)
 
 MLX_DIR = ./mlx
 
+LIBFT_DIR = ./libft/
+
 all : $(NAME)
 
 $(NAME) : $(OBJS)
+		make all -C $(LIBFT_DIR)
 		make all -C $(MLX_DIR) && cp $(MLX_DIR)/libmlx.dylib .
-		$(CC) $(CFLAG) -L./mlx -lmlx -framework OpenGL \
+		$(CC) $(CFLAG) -L./libft -lft -L./mlx -lmlx -framework OpenGL \
 		-framework Appkit $(OBJS) -o $(NAME)
 
 %.o : %.c
@@ -29,6 +32,7 @@ $(NAME) : $(OBJS)
 clean : 
 		rm -rf $(OBJS)
 		rm -rf libmlx.dylib
+		make clean -C $(LIBFT_DIR)
 		make clean -C $(MLX_DIR)
 
 fclean : clean 
