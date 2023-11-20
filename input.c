@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   input.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
+/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/13 14:51:18 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/17 23:20:52 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/20 14:34:19 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int argc_argv_check (int argc, char * argv[])
 {
     if (argc != 2)
         return failed;
-    if (fdf_file_name_check != success) //파일명이 *.fdf 인지 체크
+    if (fdf_file_name_check(argv[1]) != success) //파일명이 *.fdf 인지 체크
         return failed;
     if (access(argv[1], R_OK) == failed) //파일 권한이 있는지 체크
         return failed;

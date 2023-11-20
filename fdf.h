@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fdf.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
+/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 15:17:11 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/14 00:48:50 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/20 20:06:11 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,6 @@ typedef struct s_data
 	t_img img;
 } t_data;
 
-typedef struct s_list
-{
-	void * content; // (t_list *) list, (char *)value, (int *)value
-	struct s_list *next;
-}				t_list;
-
 typedef struct s_init
 {
 	void * mlx;
@@ -77,6 +71,50 @@ typedef struct s_init
 	t_list * list;
 }	t_init;
 
+
+// init.c
+void	ft_perror(const char *str);
+void	ft_lstiter_arg(t_list *lst,  void * arg, void (*f)(void *, void *));
+t_init * first_init (void);
+int list_init (t_init * init, char * file_name);
+int fdf_file_open (t_init * init, char * file_name);
+
+//init2.c
+void content_del (void * content);
+void split_del (void * content);
+void remove_char (void * str, void * c);
+void atoi_content (void * content);
+void * ft_split_space (void * content);
+int check_non_numeric_char(void * content);
+int int_min_max_check(void * content);
+int lst_true_false_check (t_list * list, int (*f)(void *));
+void lst_atoi (void * content);
+
+// input.c
+int fdf_file_name_check (char * file_name);
+int argc_argv_check (int argc, char * argv[]);
+
+// line.c
+void line_draw (int x1, int y1, int x2, int y2, t_img * img, int color);
+
+// print.c
+void lst_print (void * list, void * flag);
+void print_str_lst (void * list);
+void print_str(void * str);
+
+//read_line.c
+ssize_t	remainder_find_n(int fd, char **line, char remainder[][BUFFER_SIZE + 1]);
+ssize_t	read_file(int fd, char **line, char remainder[][BUFFER_SIZE + 1]);
+char	*read_flag_check(ssize_t flag, char *line);
+char	*get_next_line(int fd);
+
+//read_line2.c
+char	*ft_strdup_gnl(char *s1);
+char	*ft_strjoin_gnl(char *s1, char *s2, ssize_t size);
+size_t	ft_strlcpy_gnl(char *dest, char *src);
+ssize_t	find_newline(char *buff, ssize_t *size);
+
+//main.c
 void render_background (t_img * img, int color);
 int	render(t_data *data, int x1, int x2, int y1, int y2, int color);
 void img_pix_put (t_img * img, int x, int y, int color);
