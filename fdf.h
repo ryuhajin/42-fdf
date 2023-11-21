@@ -6,7 +6,7 @@
 /*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 15:17:11 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/20 20:06:11 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/21 18:59:30 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,13 +71,20 @@ typedef struct s_init
 	t_list * list;
 }	t_init;
 
+typedef struct s_vector
+{
+	int x;
+	int y;
+	int z;
+}	t_vector;
 
 // init.c
 void	ft_perror(const char *str);
 void	ft_lstiter_arg(t_list *lst,  void * arg, void (*f)(void *, void *));
-t_init * first_init (void);
-int list_init (t_init * init, char * file_name);
+t_init * all_init (void);
+int fdf_map_check (t_init * init, char * file_name);
 int fdf_file_open (t_init * init, char * file_name);
+void remove_char_lst (void * list, void * c);
 
 //init2.c
 void content_del (void * content);
@@ -89,6 +96,8 @@ int check_non_numeric_char(void * content);
 int int_min_max_check(void * content);
 int lst_true_false_check (t_list * list, int (*f)(void *));
 void lst_atoi (void * content);
+long long atolong (char * str);
+int lst_column_check (t_list * list);
 
 // input.c
 int fdf_file_name_check (char * file_name);
@@ -98,9 +107,12 @@ int argc_argv_check (int argc, char * argv[]);
 void line_draw (int x1, int y1, int x2, int y2, t_img * img, int color);
 
 // print.c
-void lst_print (void * list, void * flag);
-void print_str_lst (void * list);
 void print_str(void * str);
+void print_int(void * num);
+void print_map(void * map);
+void print_lst_in_str (void * list);
+void print_lst_in_int (void * list);
+void print_lst_map (void * list);
 
 //read_line.c
 ssize_t	remainder_find_n(int fd, char **line, char remainder[][BUFFER_SIZE + 1]);

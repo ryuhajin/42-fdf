@@ -6,7 +6,7 @@
 /*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/13 20:51:29 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/20 19:30:35 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/21 16:57:50 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,13 @@ int main(int argc, char * argv[])
 		printf("argc argv error\n");
 		return 0;
 	}
-	init = first_init();
+	init = all_init();
 	if (init == NULL)
 	{
 		printf("init error\n");
 		return 0;
 	}
-	if (list_init (init, argv[1]) == failed)
+	if (fdf_map_check (init, argv[1]) == failed)
 	{
 		printf("input error\n");
 		return 0;

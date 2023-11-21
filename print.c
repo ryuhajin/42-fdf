@@ -6,7 +6,7 @@
 /*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/17 23:13:23 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/20 20:06:39 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/21 17:43:15 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,41 +17,29 @@ void print_str(void * str)
 	printf("str:%s ", str);
 }
 
-void print_str_lst (void * list)
+void print_int(void * num)
 {
-	t_list * node;
+	printf("int:%d ", *(int *)num);
+}
+void print_map(void * map)
+{
+	printf("%d ", *(int *)map);
+}
 
-	node = (t_list *)list;
+void print_lst_in_str (void * list)
+{
 	ft_lstiter(list, print_str);
 	printf("\n");
 }
 
-void lst_print (void * list, void * flag)
+void print_lst_in_int (void * list)
 {
-	t_list * node;
-	// char * str;
-	int * num;
+	ft_lstiter(list, print_int);
+	printf("\n");
+}
 
-	node = (t_list *)list;
-	if (*(int *)flag == 0)
-	{
-		ft_lstiter(list, print_str);
-		// while (node != NULL)
-		// {
-		// 	str = (char *)node->content;
-		// 	printf("str:%s ", str);
-		// 	node = node->next;
-		// }
-		printf("\n");
-	}
-	else
-	{
-		while (node != NULL)
-		{
-			num = (int *)node->content;
-			printf("int:%d ", *num);
-			node = node->next;
-		}
-		printf("\n");
-	}
+void print_lst_map (void * list)
+{
+	ft_lstiter(list, print_map);
+	printf("\n");
 }

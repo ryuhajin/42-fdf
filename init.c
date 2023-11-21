@@ -6,7 +6,7 @@
 /*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/13 19:17:49 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/20 20:11:03 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/21 19:14:34 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	ft_lstiter_arg(t_list *lst,  void * arg, void (*f)(void *, void *))
 	}
 }
 
-t_init * first_init (void) // 인자 몇개 들어올지 고정이 아닌것만 동적할당 하기.
+t_init * all_init (void) // 인자 몇개 들어올지 고정이 아닌것만 동적할당 하기.
 {
     t_init * init;
 
@@ -72,17 +72,14 @@ int fdf_file_open (t_init * init, char * file_name)
     return success;
 }
 
-int list_init (t_init * init, char * file_name)
+int fdf_map_check (t_init * init, char * file_name)
 {
 	char * const lf = "\n";
 	char * const commas = ",";
-    t_list * new_node;
-	int flag = 0;
+	t_list * new_node;
 
     if (fdf_file_open(init, file_name) == failed) // 빈 파일이면 fail
         return failed;
-	// 모든 줄이 개행으로 끝나는지 확인
-	// 모든 열이 같은 크기인지 확인
     ft_lstiter_arg(init->list, (void *)lf, remove_char);
     new_node = ft_lstmap(init->list, ft_split_space, content_del);
     if (new_node == NULL)
@@ -91,16 +88,15 @@ int list_init (t_init * init, char * file_name)
     {
         ft_lstclear(&init->list, content_del);
         init->list = new_node;
-		// ft_lstiter_arg(init->list, (void *)&flag, lst_print);
-		ft_lstiter(init->list, print_str_lst);
     }
-    ft_lstiter_arg(init->list, (void *)commas, remove_char); //콤마 지우고
+	if (lst_column_check(init->list) == failed)
+		return failed;
+    ft_lstiter_arg(init->list, (void *)commas, remove_char_lst); //콤마 지우고
     if (lst_true_false_check(init->list, check_non_numeric_char) == failed)
         return failed;
     if (lst_true_false_check(init->list, int_min_max_check) == failed)
         return failed;
 	ft_lstiter(init->list, lst_atoi);
-	flag = 1;
-	ft_lstiter_arg(init->list, (void *)&flag, lst_print);
+	ft_lstiter(init->list, print_lst_map);
 	return success;
 }

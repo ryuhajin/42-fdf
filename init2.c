@@ -6,7 +6,7 @@
 /*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 13:14:13 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/20 19:28:55 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/21 20:00:14 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,37 @@ void remove_char (void * str, void * c)
     	*tmp = '\0';
 }
 
+void remove_char_lst (void * list, void * c)
+{
+	ft_lstiter_arg(list, c, remove_char);
+}
+
+long long atolong (char * str)
+{
+	long long	numbers;
+	int			minus;
+	size_t		i;
+
+	numbers = 0;
+	minus = 1;
+	i = 0;
+	while ((9 <= str[i] && str[i] <= 13) || str[i] == 32)
+		i++;
+	if ('-' == str[i] || '+' == str[i])
+	{
+		if ('-' == str[i])
+			minus = -1;
+		i++;
+	}
+	while ('0' <= str[i] && str[i] <= '9')
+	{
+		numbers *= 10;
+		numbers += str[i] - '0';
+		i++;
+	}
+	return (numbers * minus);
+}
+
 void * ft_split_space (void * content)
 {
     char ** split;
@@ -67,13 +98,13 @@ void * ft_split_space (void * content)
 }
 
 
-int check_non_numeric_char(void * content)
+int check_non_numeric_char(void * list)
 {
 	t_list * temp;
     char * str;
     int i;
 	
-	temp = (t_list *)content;
+	temp = (t_list *)list;
     while (temp != NULL)
     {	
 		i = 0;
@@ -86,24 +117,24 @@ int check_non_numeric_char(void * content)
                 return failed;
 			i++;
         }
-        if ((i == 1 && str[i] == '-') || (i == 1 && str[i] == '+'))
+        if ((i == 1 && str[0] == '-') || (i == 1 && str[0] == '+'))
             return failed;
 		temp = temp->next;
     }
     return success;
 }
 
-int int_min_max_check(void * content)
+int int_min_max_check(void * list)
 {
 	t_list * temp;
     char * str;
     long long	atoi;
 
-	temp = (t_list *)content;
+	temp = (t_list *)list;
 	while (temp != NULL)
 	{
 		str = (char *)temp->content;
-		atoi = ft_atoi(str);
+		atoi = atolong(str);
 		if (atoi < INT_MIN || INT_MAX < atoi)
 			return (failed);
 		temp = temp->next;
@@ -126,6 +157,24 @@ void lst_atoi (void * content)
 		list->content = (void *)ptr;
 		list = list->next;
 	}
+}
+
+int lst_column_check (t_list * list)
+{
+	t_list * node;
+	int lst_cnt;
+	int next_lst_cnt;
+
+	while (list->next != NULL)
+	{
+		node = list->content;
+		lst_cnt = (ft_lstsize(node));
+		next_lst_cnt = (ft_lstsize(list->next->content));
+		if (lst_cnt != next_lst_cnt)
+			return failed;
+		list = list->next;
+	}
+	return success;
 }
 
 int lst_true_false_check (t_list * list, int (*f)(void *))
