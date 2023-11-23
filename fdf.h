@@ -6,7 +6,7 @@
 /*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 15:17:11 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/21 18:59:30 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/23 19:17:14 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,10 @@
 # ifndef OPEN_MAX
 #  define OPEN_MAX 1024
 # endif
+
+# ifndef COS_30
+# define COS_30 0.86602540378f
+#endif
 
 typedef enum e_status
 {
