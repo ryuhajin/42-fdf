@@ -35,9 +35,16 @@ clean :
 		make clean -C $(LIBFT_DIR)
 		make clean -C $(MLX_DIR)
 
+.PHONY: oclean
+oclean :
+		rm -rf $(OBJS)
+
 fclean : clean 
 	    rm -rf $(NAME)
 
 re : fclean all
+
+ore : oclean
+	make
 
 .PHONY : all clean fclean re

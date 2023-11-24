@@ -6,7 +6,7 @@
 /*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 15:17:11 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/23 19:17:14 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/24 21:45:54 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,10 @@
 # define COS_30 0.86602540378f
 #endif
 
+# ifndef WHITE
+# define WHITE 0xFFFFFF
+#endif
+
 typedef enum e_status
 {
 	failed = -1,
@@ -54,7 +58,8 @@ typedef struct s_img
 	void * mlx_img; //mlx_img 는 mlx_new_image 함수가 반환하는 주소를 참조한다.
 	char * addr;
 	int bits_per_pixel; //픽셀 당 몇 비트가 할당되는가 //보통 ARGB는 알파벳 하나당 8비트. 즉 32비트 = 4바이트.
-	int line_length; // 한 줄당 몇 바이트인가
+	//bit_per_pixel = pixel bit == 32 (int 4byte)
+	int line_length; // 한 줄당 몇 바이트인가 line_length = width * 4 (가로 길이 * int 4byte)
 	int endian;
 } t_img; // mlx image를 사용하는데 필요한 모든 내용이 담긴 구조체
 // mlx_new_image 함수는 공유 메모리 상에 가로, 세로 해상도 만큼의 공간을 할당하는듯. 도화지 생성?
@@ -108,7 +113,15 @@ int fdf_file_name_check (char * file_name);
 int argc_argv_check (int argc, char * argv[]);
 
 // line.c
-void line_draw (int x1, int y1, int x2, int y2, t_img * img, int color);
+void ft_vector_swap (t_vector *a, t_vector *b);
+void img_pix_put (t_img * img, int x, int y);
+void line_draw(t_img * img, t_vector *v1, t_vector *v2);
+void point_img_x_plus (t_vector * vec1, t_vector * vec2, t_img * img);
+void point_img_y_plus (t_vector * vec1, t_vector * vec2, t_img * img);
+void * make_vector_node (void * list);
+void set_vector_xy (void * list, void * vector);
+int make_vector_list(t_init * init);
+void xyz_change_isometric_coodinate (void * content, void * pfilter);
 
 // print.c
 void print_str(void * str);
@@ -130,10 +143,8 @@ char	*ft_strjoin_gnl(char *s1, char *s2, ssize_t size);
 size_t	ft_strlcpy_gnl(char *dest, char *src);
 ssize_t	find_newline(char *buff, ssize_t *size);
 
-//main.c
-void render_background (t_img * img, int color);
-int	render(t_data *data, int x1, int x2, int y1, int y2, int color);
-void img_pix_put (t_img * img, int x, int y, int color);
-void line_draw (int x1, int y1, int x2, int y2, t_img * img, int color);
+// //main.c
+// void render_background (t_img * img, int color);
+// int	render(t_data *data, int x1, int x2, int y1, int y2, int color);
 
 #endif
