@@ -6,17 +6,16 @@
 /*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/13 20:51:29 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/24 22:05:25 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/26 23:13:49 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-t_vector	*zero_vec(t_vector	*vec)
+t_idx	* zero_vec(t_idx	*vec)
 {
 	vec->x = 0;
 	vec->y = 0;
-	vec->z = 0;
 	return (vec);
 }
 
@@ -65,14 +64,15 @@ void	rec_free(void *ptr, int depth)
 	free(ptr);
 }
 
-t_vector	***lst_to_arr(t_list *lst)
+t_vector	***lst_change_to_arr(t_list *lst)
 {
 	t_vector***const	arr
 		= rec_malloc(sizeof(t_vector),
 			(int []){ft_lstsize(lst), ft_lstsize(lst->content), 1}, 3);
-	t_vector			index;
-	t_list				*inner_list;
+	t_idx	index;
+	t_list	*inner_list;
 
+	zero_vec(&index);
 	index.y = 0;
 	while (arr[index.y] != NULL)
 	{
@@ -96,14 +96,61 @@ void	print_vec(void *pvec)
 {
 	t_vector*const	vec = pvec;
 
-	printf("[%d %d %d]", vec->x, vec->y, vec->z);
+	printf("[%f %f %f]", vec->x, vec->y, vec->z);
 }
 
 /*
 get array of pointer,
 call function for each pointer
+
+arr : array of pointer (data : pointer)
+n-dimension (void * int ********)
+
+data : int **
+f(int **);
+f(void *ptr)
+{
+	int ** content = ptr;
+}
+
+(t_vector *)** arr;
+(t_vector *) arr[][];
+t_vector arr[][];
+t_vector arr[][];
+pointer (NULL, unknown(void) type)
+arr[0] = 0xa0
+arr[1] = 0xb0
+arr[2] = NULL
+
+arr[0][0] = 0xa0
+arr[0][1] = NULL
+
+arr[0][0]->x = 1
+
+// 1-dimension
+printdata(void *ptr); // content를 받아서 int *로 캐스팅 -> 접근해서 출력
+{
+	(int *)val = ptr;
+	printf("%d", *val);
+}
+(int *)*arr;
+ft_arriter(arr, printdata);
+// iter의 접근 방식 = 1차원에 content가 있는 방식으로 바라봄
+// content가 무언가의 포인터임
+
+// 2-dimension
+print1d(void *ptr) // content를 받아서 (int *)*로 캐스팅 -> iter, print1d
+{
+	(int *)*arr = ptr;
+	ft_arriter(arr, printdata);
+}
+(int *)**arr; // 2차원 데이터
+ft_arriter(arr, print1d); // 2차원 데이터를 순회하면서, 1차원 데이터를 출력하는 함수에 넣어라
+// iter의 접근 방식 = 1차원에 content가 있는 방식으로 바라봄
+print1d(arr[i]);
 */
-void	ft_arriter(void **arr, void (*f)(void *))
+
+void	ft_arriter(void ** arr, void (*f)(void *))
 {
 	unsigned int	i;
 
@@ -124,7 +171,7 @@ void	print_line(void *parr)
 
 void draw_line(t_vector ***arr, t_img *img)
 {
-	t_vector	index;
+	t_idx	index;
 
 	zero_vec(&index);
 	while (arr[index.y] != NULL)
@@ -142,41 +189,134 @@ void draw_line(t_vector ***arr, t_img *img)
 	}
 }
 
-/*-----------=---=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-void iso_lst (t_init * init)
+void iso_lst (t_list * list, float zratio)
 {
-	t_list * list;
-	float filter;
-	
-	list = init->list;
-	filter = 12.0;
 	while (list != NULL)
 	{
-		ft_lstiter_arg(list->content, (void *)&filter, xyz_change_isometric_coodinate);
+		ft_lstiter_arg(list->content, (void *)&zratio, xyz_change_isometric_coodinate);
 		list = list->next;
 	}	
 }
 
-void scale_vec(void *pvec)
+/*
+(t_vector *)(ft_lstlast(list->content)->content); // p1
+(t_vector *)(ft_lstlast(ft_lstlast(list)->content)->content) // p2;
+(t_vector *)(((t_list *)ft_lstlast(list)->content)->content) // p3;
+*/
+float get_scale_test(t_vector p1, t_vector p2, t_vector p3)
 {
-	t_vector *vec = pvec;
+	float scale;
+	float img_width;
+	float img_height;
+	float zratio;
 
-	vec->x *= 50;
-	vec->y *= 50;
+	zratio = 0.0f;
+	xyz_change_isometric_coodinate((void *)&p1, (void *)&zratio);
+	xyz_change_isometric_coodinate((void *)&p2, (void *)&zratio);
+	xyz_change_isometric_coodinate((void *)&p3, (void *)&zratio);
+	img_width = fabsf(p1.x - p3.x);
+	img_height = fabsf(p2.y);
+
+	printf("img_width: %f\n", img_width);
+	printf("img_height: %f\n", img_height);
+	scale = WIDTH / img_width;
+	if (scale > HEIGHT / img_height)
+	{
+		scale = HEIGHT / img_height;
+	}
+	printf("scale: %f\n", scale);
+	return scale;
 }
 
-void scale_loop(void *plst)
+float get_scale (t_vector *** arr)
+{
+	t_idx index;
+	float scale;
+	float img_width;
+	float img_height;
+
+	zero_vec(&index);
+	while (arr[index.y] != NULL)
+	{
+		index.x = 0;
+		while (arr[index.y][index.x] != NULL)
+			index.x++;
+		index.y++;
+	}
+
+	img_width = fabsf(arr[index.y-1][0]->x - arr[0][index.x-1]->x);
+	img_height = fabs(0 - arr[index.y-1][index.x-1]->y);
+
+	printf("img_width: %f\n", img_width);
+	printf("img_height: %f\n", img_height);
+	scale = WIDTH / img_width;
+	printf("scale: %f\n", scale);
+	if (scale > HEIGHT / img_height)
+	{
+		scale = HEIGHT / img_height;
+		printf("scale: %f\n", scale);
+	}
+	return scale;
+}
+
+void scale_vec (t_vector *** arr)
+{
+	t_idx	index;
+	float scale;
+
+	zero_vec(&index);
+	scale = get_scale(arr);
+	while (arr[index.y] != NULL)
+	{
+		index.x = 0;
+		while (arr[index.y][index.x] != NULL)
+		{
+			arr[index.y][index.x]->x = (float)arr[index.y][index.x]->x * scale;
+			arr[index.y][index.x]->y = (float)arr[index.y][index.x]->y * scale;
+			index.x++;
+		}
+		index.y++;
+	}
+}
+
+void move_vec (t_vector *** arr)
+{
+	t_idx	index;
+
+	zero_vec(&index);
+	while (arr[index.y] != NULL)
+	{
+		index.x = 0;
+		while (arr[index.y][index.x] != NULL)
+		{
+			arr[index.y][index.x]->x += 0;
+			arr[index.y][index.x]->y += 0;
+			index.x++;
+		}
+		index.y++;
+	}
+}
+
+void sv(void *pvec, void *arg)
+{
+	t_vector	*vec = pvec;
+	float		*scale = arg;
+
+	vec->x *= *scale;
+	vec->y *= *scale;
+}
+
+void scale_loop(void *plst, void *arg)
 {
 	t_list *lst = plst;
-	ft_lstiter(lst, scale_vec);
+	ft_lstiter_arg(lst, arg, sv);
 }
+
 
 int main(int argc, char * argv[])
 {
 	t_init * init;
 
-	
 	if (argc_argv_check (argc, argv) == failed)
 	{
 		printf("argc argv error\n");
@@ -198,68 +338,21 @@ int main(int argc, char * argv[])
 		printf("vector error\n");
 		return 0;
 	}
-	ft_lstiter(init->list, scale_loop);
-	ft_lstiter(init->list, print_lst_map);
-	iso_lst(init);
-	t_vector ***arr = lst_to_arr(init->list);
-	ft_arriter((void **)arr, print_line);
-	draw_line(arr, init->img);
-	// line_draw_lst(init);
-	
-	// test line draw
-	// t_vector v1, v2;
-	// v1.x = 200;
-	// v1.y = 100;
-	
-	// v2.x = 200;
-	// v2.y = 0;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 260;
-	// v2.y = 0;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 300;
-	// v2.y = 0;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 300;
-	// v2.y = 40;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 300;
-	// v2.y = 100;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 300;
-	// v2.y = 160;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 300;
-	// v2.y = 200;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 260;
-	// v2.y = 200;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 200;
-	// v2.y = 200;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 140;
-	// v2.y = 200;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 100;
-	// v2.y = 200;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 100;
-	// v2.y = 160;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 100;
-	// v2.y = 100;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 100;
-	// v2.y = 40;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 100;
-	// v2.y = 0;
-	// line_draw(init->img, &v1, &v2);
-	// v2.x = 140;
-	// v2.y = 0;
-	// line_draw(init->img, &v1, &v2);
+	// ft_lstiter(init->list, print_map);
+	float scale = get_scale_test(
+		*(t_vector *)(ft_lstlast(init->list->content)->content),
+		*(t_vector *)(ft_lstlast(ft_lstlast(init->list)->content)->content),
+		*(t_vector *)(((t_list *)ft_lstlast(init->list)->content)->content)
+	);
+	ft_lstiter_arg(init->list, (void *)&scale, scale_loop);
+	// if (scale > 5.0f)
+	// 	iso_lst(init->list, scale / 5.0f);
+	// else
+	iso_lst(init->list, 1000.0f);
+	init->map = lst_change_to_arr(init->list);
+	// move_vec(init->map);
+	draw_line(init->map, init->img);
 	mlx_put_image_to_window(init->mlx, init->data->win_ptr, init->data->img.mlx_img, 0, 0);
 	mlx_loop(init->mlx);
-	rec_free(arr, 3);
+	rec_free(init->map, 3);
 }

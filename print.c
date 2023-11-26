@@ -6,7 +6,7 @@
 /*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/17 23:13:23 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/24 20:32:03 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/26 22:37:13 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void print_map(void * map)
 {
 	t_vector * vector;
 	vector = (t_vector *)map;
-	printf("{%d %d %d}", vector->x, vector->y, vector->z);
+	printf("{%f %f %f}", vector->x, vector->y, vector->z);
 }
 
 void print_lst_in_str (void * list)

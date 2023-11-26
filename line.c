@@ -6,7 +6,7 @@
 /*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 21:21:35 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/24 21:58:43 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/26 23:19:32 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void ft_vector_swap (t_vector *a, t_vector *b)
 void img_pix_put (t_img * img, int x, int y)
 {
 	// !DEBUG
-	if (x < 0 || x >= 1920 || y < 0 || y >= 1080)
+	if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
 		return ;
 	char * pixel;
 	pixel = img->addr + (y * img->line_length + x * (img->bits_per_pixel / 8));
@@ -78,10 +78,11 @@ void point_img_x_plus (t_vector * vec1, t_vector * vec2, t_img * img)
 	origin_y = p1.y;
 	while (p1.x <= p2.x)
 	{
-		img_pix_put(img, p1.x, p1.y);
+		// img_pix_put(img, p1.x, p1.y);
+		img_pix_put(img, p1.x, origin_y);
 		p1.x++;
 		origin_y += slope;
-		p1.y = roundf(origin_y);
+		// p1.y = roundf(origin_y);
 	}
 }
 
@@ -103,10 +104,11 @@ void point_img_y_plus (t_vector * vec1, t_vector * vec2, t_img * img)
 	origin_x = p1.x;
 	while (p1.y <= p2.y)
 	{
-		img_pix_put(img, p1.x, p1.y);
+		// img_pix_put(img, p1.x, p1.y);
+		img_pix_put(img, origin_x, p1.y);
 		p1.y++;
 		origin_x += slope;
-		p1.x = roundf(origin_x);
+		// p1.x = roundf(origin_x);
 	}
 }
 
@@ -125,6 +127,7 @@ void * make_vector_node (void * list) //map에서 list->content를 넘겨준다.
 		if (vector == NULL)
 			return NULL;
 		vector->z = *(int *)node->content;
+		printf("vector: %f %f %f\n", vector->x, vector->y, vector->z);
 		new_node = ft_lstnew(vector);
 		if (new_node == NULL)
 			return NULL;
@@ -142,7 +145,7 @@ void set_vector_xy (void * list, void * vector)
 
 	vec = (t_vector *)vector;
 	temp = (t_list *)list;
-	vec->x = 0;
+	vec->x = 0.0f;
 	while (temp != NULL)
 	{
 		node_point = temp->content;
@@ -159,9 +162,8 @@ int make_vector_list(t_init * init)
 	t_list * new_node;
 	t_vector vector;
 	
-	vector.x = 0;
-	vector.y = 0;
-	
+	vector.x = 0.0f;
+	vector.y = 0.0f;
 	new_node = ft_lstmap(init->list, make_vector_node, content_del);
     if (new_node == NULL)
         return failed;
@@ -175,16 +177,16 @@ int make_vector_list(t_init * init)
 	return success;
 }
 
-void xyz_change_isometric_coodinate (void * content, void * pfilter) 
+void xyz_change_isometric_coodinate (void * content, void * zratio) 
 {
-	t_vector*const point = content;
+	t_vector * const point = content;
 	const float x = point->x;
 	const float y = point->y;
 	const float z = point->z;
-	const float filter = *(float *)pfilter;
+	const float ratio = *(float *)zratio;
 
-	point->x = roundf(COS_30 * (x - y));
-	point->y = roundf((0.5 * (x + y)) - (z * filter));
+	point->x = (COS_30 * (x - y));
+	point->y = ((0.5 * (x + y)) - (z * ratio));
 
 	/* 
 	내가 해야할 것

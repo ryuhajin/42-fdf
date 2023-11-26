@@ -6,7 +6,7 @@
 /*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 15:17:11 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/24 21:45:54 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/26 23:08:09 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,20 @@
 #  define OPEN_MAX 1024
 # endif
 
+# ifndef FILTER
+# define FILTER 1.0f
+#endif
+
 # ifndef COS_30
 # define COS_30 0.86602540378f
+#endif
+
+# ifndef WIDTH
+# define WIDTH 1920
+#endif
+
+# ifndef HEIGHT
+# define HEIGHT 1080
 #endif
 
 # ifndef WHITE
@@ -53,6 +65,7 @@ typedef enum e_new_line_status
 	make_new_line = 1,
 	line_malloc_failed = 2
 }			t_make_line_status;
+
 typedef struct s_img
 {
 	void * mlx_img; //mlx_img 는 mlx_new_image 함수가 반환하는 주소를 참조한다.
@@ -72,20 +85,28 @@ typedef struct s_data
 	t_img img;
 } t_data;
 
+typedef struct s_vector
+{
+	float x;
+	float y;
+	float z;
+}	t_vector;
+
+typedef struct s_idx
+{
+	int x;
+	int y;
+} t_idx;
+
+
 typedef struct s_init
 {
 	void * mlx;
 	t_data * data;
 	t_img * img;
 	t_list * list;
+	t_vector *** map;
 }	t_init;
-
-typedef struct s_vector
-{
-	int x;
-	int y;
-	int z;
-}	t_vector;
 
 // init.c
 void	ft_perror(const char *str);
