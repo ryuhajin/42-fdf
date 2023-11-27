@@ -3,28 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   line.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
+/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 21:21:35 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/26 23:19:32 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/28 00:59:13 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-void ft_vector_swap (t_vector *a, t_vector *b)
+void ft_vector_swap (t_point *a, t_point *b)
 {
-	t_vector temp;
+	t_point temp;
 	
 	temp.x = a->x;
 	temp.y = a->y;
-	temp.z = a->z;
 	a->x = b->x;
 	a->y = b->y;
-	a->z = b->z;
 	b->x = temp.x;
 	b->y = temp.y;
-	b->z = temp.z;
 }
 
 void img_pix_put (t_img * img, int x, int y)
@@ -40,77 +37,124 @@ void img_pix_put (t_img * img, int x, int y)
 
 void line_draw(t_img * img, t_vector *v1, t_vector *v2)
 {
-	float slope;
+	float del_x;
+	float del_y;
+	t_point p1;
+	t_point p2;
 
-	if (v1->x == v2->x)
-		slope = INFINITY;
-	else if (v1->y == v2->y)
-		slope = 0;
-	else
-		slope = (float)(v2->y - v1->y) / (float)(v2->x - v1->x);
-	if (-1.0f <= slope && slope <= 1.0f) //기울기가 1보다 크다 == 선의 각도가 45도 이상 == y 변화량이 큼 y를 1씩 더해가며 점을 찍어야한다
-		point_img_x_plus(v1, v2, img);
-	else
-		point_img_y_plus(v1, v2, img);
-}
-
-void point_img_x_plus (t_vector * vec1, t_vector * vec2, t_img * img)
-{
-	t_vector p1;
-	t_vector p2;
-	float slope;
-	float origin_y;
-
-	p1.x = vec1->x;
-	p2.x = vec2->x;
-	p1.y = vec1->y;
-	p2.y = vec2->y;
-	
-	if (p1.x > p2.x)
-		ft_vector_swap(&p1, &p2);
-
-	// if (vec1->x == vec2->x)
-	// 	slope = 1;
-	// else if (vec1->y == vec2->y)
-	// 	slope = 0;
+	del_x = (float)fabsf(v2->x - v1->x);
+	del_y = (float)fabsf(v2->y - v1->y);
+	p1.x = roundf(v1->x);
+	p1.y = roundf(v1->y);
+	p2.x = roundf(v2->x);
+	p2.y = roundf(v2->y);
+	if (del_x > del_y)
+		dda_to_br(p1, p2, img);
+		// point_img_x_plus(v1, v2, img);
 	// else
-		slope = (float)(p2.y - p1.y) / (float)(p2.x - p1.x);
-	origin_y = p1.y;
-	while (p1.x <= p2.x)
-	{
-		// img_pix_put(img, p1.x, p1.y);
-		img_pix_put(img, p1.x, origin_y);
-		p1.x++;
-		origin_y += slope;
-		// p1.y = roundf(origin_y);
-	}
+	// 	point_img_y_plus(v1, v2, img);
 }
 
-void point_img_y_plus (t_vector * vec1, t_vector * vec2, t_img * img)
+// void point_img_x_plus (t_vector * vec1, t_vector * vec2, t_img * img)
+// {
+// 	t_vector p1;
+// 	t_vector p2;
+// 	float slope;
+// 	float origin_y;
+
+// 	p1.x = vec1->x;
+// 	p2.x = vec2->x;
+// 	p1.y = vec1->y;
+// 	p2.y = vec2->y;
+	
+// 	if (p1.x > p2.x)
+// 		ft_vector_swap(&p1, &p2);
+
+// 	slope = (float)(p2.y - p1.y) / (float)(p2.x - p1.x) * (p2.x - p1.x);
+// 	origin_y = (p1.y + slope / (p2.x - p1.x)) * (p2.x - p1.x);
+// 	while (p1.x <= p2.x)
+// 	{
+// 		img_pix_put(img, p1.x, p1.y);
+// 		p1.x += 1.0f;
+// 		origin_y += slope / (p2.x - p1.x);
+// 		p1.y = roundf(origin_y);
+// 	}
+// }
+// int x1, int y1, int x2, int y2, t_img *img
+void dda_to_br(t_point v1, t_point v2, t_img * img)
 {
-	t_vector p1;
-	t_vector p2;
-	float slope;
-	float origin_x;
+	int delta_y; // 실수 (나눗셈) >> * dx
+	int delta_x;
+	int sum_slope = 0;
+	int	unit_y;
 
-	p1.x = vec1->x;
-	p2.x = vec2->x;
-	p1.y = vec1->y;
-	p2.y = vec2->y;
-
-	if (p1.y > p2.y)
-		ft_vector_swap(&p1, &p2);
-	slope = (float)(p2.x - p1.x) / (float)(p2.y - p1.y);
-	origin_x = p1.x;
-	while (p1.y <= p2.y)
+	if (v1.x > v2.x)
+		ft_vector_swap(&v1, &v2);
+	unit_y = 1;
+	if (v1.y > v2.y)
+		unit_y = -1;
+	delta_y = abs(v2.y - v1.y);
+	delta_x = abs(v2.x - v1.x);
+	while (v1.x < v2.x)
 	{
-		// img_pix_put(img, p1.x, p1.y);
-		img_pix_put(img, origin_x, p1.y);
-		p1.y++;
-		origin_x += slope;
-		// p1.x = roundf(origin_x);
+		v1.x += 1;
+		sum_slope += delta_y;
+		if (sum_slope * 2 > delta_x) // 1/2 (나눗셈) >> * 2
+		{
+			sum_slope -= delta_x;
+			v1.y += unit_y;
+		}
+		img_pix_put(img, v1.x, v1.y);
 	}
 }
+
+// void dda(const int x1, const int y1, const int x2, const int y2)
+// {
+// 	int px = x1;
+// 	int py = y1;
+// 	float slope = (y2 - y1) / (x2 - x1); // 실수 (나눗셈) >> * dx
+// 	float sum_slope = 0.0f;
+
+// 	while (px <= x2)
+// 	{
+// 		// draw_point(px, py);
+// 		// x
+// 		px += 1;
+// 		// y
+// 		sum_slope += slope;
+// 		if (sum_slope > 0.5) // 1/2 (나눗셈) >> * 2
+// 		{
+// 			sum_slope -= 1.0f;
+// 			py += 1;
+// 		}
+// 	}
+// }
+
+// void point_img_y_plus (t_vector * vec1, t_vector * vec2, t_img * img)
+// {
+// 	return;
+// 	t_vector p1;
+// 	t_vector p2;
+// 	float slope;
+// 	float origin_x;
+
+// 	p1.x = vec1->x;
+// 	p2.x = vec2->x;
+// 	p1.y = vec1->y;
+// 	p2.y = vec2->y;
+
+// 	if (p1.y > p2.y)
+// 		ft_vector_swap(&p1, &p2);
+// 	slope = (float)(p2.x - p1.x) / (float)(p2.y - p1.y);
+// 	origin_x = p1.x + slope;
+// 	while (p1.y < p2.y - 1.0f)
+// 	{
+// 		img_pix_put(img, p1.x, p1.y);
+// 		p1.y++;
+// 		origin_x += slope;
+// 		p1.x = roundf(origin_x);
+// 	}
+// }
 
 void * make_vector_node (void * list) //map에서 list->content를 넘겨준다. (즉 list 행을 넘겨줌)
 {

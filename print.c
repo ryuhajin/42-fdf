@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   print.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
+/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/17 23:13:23 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/26 22:37:13 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/27 12:59:51 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void print_str(void * str)
 {
-	printf("str:%s", str);
+	printf("str:%s", (char *)str);
 }
 
 void print_int(void * num)

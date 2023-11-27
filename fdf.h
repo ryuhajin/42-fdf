@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fdf.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
+/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 15:17:11 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/26 23:08:09 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/28 01:03:57 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,24 @@
 #  define OPEN_MAX 1024
 # endif
 
-# ifndef FILTER
-# define FILTER 1.0f
+# ifndef Z_RATIO
+# define Z_RATIO 5.0f
 #endif
 
 # ifndef COS_30
 # define COS_30 0.86602540378f
+#endif
+
+# ifndef P1
+# define P1 ft_lstlast(init->list->content)->content
+#endif
+
+# ifndef P2
+# define P2 ft_lstlast(ft_lstlast(init->list)->content)->content
+#endif
+
+# ifndef P3
+# define P3 ((t_list *)ft_lstlast(init->list)->content)->content
 #endif
 
 # ifndef WIDTH
@@ -97,6 +109,7 @@ typedef struct s_idx
 	int x;
 	int y;
 } t_idx;
+typedef t_idx t_point;
 
 
 typedef struct s_init
@@ -134,15 +147,18 @@ int fdf_file_name_check (char * file_name);
 int argc_argv_check (int argc, char * argv[]);
 
 // line.c
-void ft_vector_swap (t_vector *a, t_vector *b);
+void ft_vector_swap (t_point *a, t_point *b);
 void img_pix_put (t_img * img, int x, int y);
 void line_draw(t_img * img, t_vector *v1, t_vector *v2);
-void point_img_x_plus (t_vector * vec1, t_vector * vec2, t_img * img);
+//void point_img_x_plus (t_vector * vec1, t_vector * vec2, t_img * img);
 void point_img_y_plus (t_vector * vec1, t_vector * vec2, t_img * img);
 void * make_vector_node (void * list);
 void set_vector_xy (void * list, void * vector);
 int make_vector_list(t_init * init);
 void xyz_change_isometric_coodinate (void * content, void * pfilter);
+
+void dda_to_br(t_point v1, t_point v2, t_img * img);
+
 
 // print.c
 void print_str(void * str);

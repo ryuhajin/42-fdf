@@ -36,6 +36,7 @@ clean :
 		make clean -C $(MLX_DIR)
 
 .PHONY: oclean
+
 oclean :
 		rm -rf $(OBJS)
 

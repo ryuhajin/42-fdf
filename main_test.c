@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_test.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
+/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/13 20:51:29 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/26 23:13:49 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/27 21:09:50 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,12 +198,8 @@ void iso_lst (t_list * list, float zratio)
 	}	
 }
 
-/*
-(t_vector *)(ft_lstlast(list->content)->content); // p1
-(t_vector *)(ft_lstlast(ft_lstlast(list)->content)->content) // p2;
-(t_vector *)(((t_list *)ft_lstlast(list)->content)->content) // p3;
-*/
-float get_scale_test(t_vector p1, t_vector p2, t_vector p3)
+
+float get_scale_point(t_vector p1, t_vector p2, t_vector p3)
 {
 	float scale;
 	float img_width;
@@ -221,62 +217,9 @@ float get_scale_test(t_vector p1, t_vector p2, t_vector p3)
 	printf("img_height: %f\n", img_height);
 	scale = WIDTH / img_width;
 	if (scale > HEIGHT / img_height)
-	{
 		scale = HEIGHT / img_height;
-	}
 	printf("scale: %f\n", scale);
 	return scale;
-}
-
-float get_scale (t_vector *** arr)
-{
-	t_idx index;
-	float scale;
-	float img_width;
-	float img_height;
-
-	zero_vec(&index);
-	while (arr[index.y] != NULL)
-	{
-		index.x = 0;
-		while (arr[index.y][index.x] != NULL)
-			index.x++;
-		index.y++;
-	}
-
-	img_width = fabsf(arr[index.y-1][0]->x - arr[0][index.x-1]->x);
-	img_height = fabs(0 - arr[index.y-1][index.x-1]->y);
-
-	printf("img_width: %f\n", img_width);
-	printf("img_height: %f\n", img_height);
-	scale = WIDTH / img_width;
-	printf("scale: %f\n", scale);
-	if (scale > HEIGHT / img_height)
-	{
-		scale = HEIGHT / img_height;
-		printf("scale: %f\n", scale);
-	}
-	return scale;
-}
-
-void scale_vec (t_vector *** arr)
-{
-	t_idx	index;
-	float scale;
-
-	zero_vec(&index);
-	scale = get_scale(arr);
-	while (arr[index.y] != NULL)
-	{
-		index.x = 0;
-		while (arr[index.y][index.x] != NULL)
-		{
-			arr[index.y][index.x]->x = (float)arr[index.y][index.x]->x * scale;
-			arr[index.y][index.x]->y = (float)arr[index.y][index.x]->y * scale;
-			index.x++;
-		}
-		index.y++;
-	}
 }
 
 void move_vec (t_vector *** arr)
@@ -316,6 +259,7 @@ void scale_loop(void *plst, void *arg)
 int main(int argc, char * argv[])
 {
 	t_init * init;
+	float scale;
 
 	if (argc_argv_check (argc, argv) == failed)
 	{
@@ -338,20 +282,20 @@ int main(int argc, char * argv[])
 		printf("vector error\n");
 		return 0;
 	}
-	// ft_lstiter(init->list, print_map);
-	float scale = get_scale_test(
-		*(t_vector *)(ft_lstlast(init->list->content)->content),
-		*(t_vector *)(ft_lstlast(ft_lstlast(init->list)->content)->content),
-		*(t_vector *)(((t_list *)ft_lstlast(init->list)->content)->content)
-	);
+	scale = get_scale_point(*(t_vector *)(P1), *(t_vector *)(P2), *(t_vector *)(P3));
 	ft_lstiter_arg(init->list, (void *)&scale, scale_loop);
-	// if (scale > 5.0f)
-	// 	iso_lst(init->list, scale / 5.0f);
-	// else
-	iso_lst(init->list, 1000.0f);
+	if (scale > 30.0f)
+	{
+		scale *= 0.6;
+		iso_lst(init->list, scale);
+	}
+	else
+		iso_lst(init->list, scale);
 	init->map = lst_change_to_arr(init->list);
-	// move_vec(init->map);
 	draw_line(init->map, init->img);
+	// t_vector v1 = {0, 0, 0};
+	// t_vector v2 = {1920, 1080, 0};
+	// line_draw(init->img, &v1, &v2);
 	mlx_put_image_to_window(init->mlx, init->data->win_ptr, init->data->img.mlx_img, 0, 0);
 	mlx_loop(init->mlx);
 	rec_free(init->map, 3);
