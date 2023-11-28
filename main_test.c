@@ -3,14 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   main_test.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
+/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/13 20:51:29 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/27 21:09:50 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/28 21:44:19 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
+
+void	check_leak(void)
+{
+	system("leaks --list -- fdf");
+}
 
 t_idx	* zero_vec(t_idx	*vec)
 {
@@ -19,11 +24,6 @@ t_idx	* zero_vec(t_idx	*vec)
 	return (vec);
 }
 
-/*
-allocate n-dimension memory.
-NULL-terminated.
-usage: rec_malloc(sizeof(t_vector), (int[]){size_y, size_x}, 2);
-*/
 void	*rec_malloc(size_t unit, int count[], int depth)
 {
 	void	**ptr;
@@ -42,10 +42,6 @@ void	*rec_malloc(size_t unit, int count[], int depth)
 	return (ptr);
 }
 
-/*
-free n-dimension memory.
-more than 1-dimension pointer sholud be NULL-terminated.
-*/
 void	rec_free(void *ptr, int depth)
 {
 	void	**dptr;
@@ -99,57 +95,6 @@ void	print_vec(void *pvec)
 	printf("[%f %f %f]", vec->x, vec->y, vec->z);
 }
 
-/*
-get array of pointer,
-call function for each pointer
-
-arr : array of pointer (data : pointer)
-n-dimension (void * int ********)
-
-data : int **
-f(int **);
-f(void *ptr)
-{
-	int ** content = ptr;
-}
-
-(t_vector *)** arr;
-(t_vector *) arr[][];
-t_vector arr[][];
-t_vector arr[][];
-pointer (NULL, unknown(void) type)
-arr[0] = 0xa0
-arr[1] = 0xb0
-arr[2] = NULL
-
-arr[0][0] = 0xa0
-arr[0][1] = NULL
-
-arr[0][0]->x = 1
-
-// 1-dimension
-printdata(void *ptr); // content를 받아서 int *로 캐스팅 -> 접근해서 출력
-{
-	(int *)val = ptr;
-	printf("%d", *val);
-}
-(int *)*arr;
-ft_arriter(arr, printdata);
-// iter의 접근 방식 = 1차원에 content가 있는 방식으로 바라봄
-// content가 무언가의 포인터임
-
-// 2-dimension
-print1d(void *ptr) // content를 받아서 (int *)*로 캐스팅 -> iter, print1d
-{
-	(int *)*arr = ptr;
-	ft_arriter(arr, printdata);
-}
-(int *)**arr; // 2차원 데이터
-ft_arriter(arr, print1d); // 2차원 데이터를 순회하면서, 1차원 데이터를 출력하는 함수에 넣어라
-// iter의 접근 방식 = 1차원에 content가 있는 방식으로 바라봄
-print1d(arr[i]);
-*/
-
 void	ft_arriter(void ** arr, void (*f)(void *))
 {
 	unsigned int	i;
@@ -189,11 +134,11 @@ void draw_line(t_vector ***arr, t_img *img)
 	}
 }
 
-void iso_lst (t_list * list, float zratio)
+void isometric_xyz (t_list * list, float * zratio)
 {
 	while (list != NULL)
 	{
-		ft_lstiter_arg(list->content, (void *)&zratio, xyz_change_isometric_coodinate);
+		ft_lstiter_arg(list->content, (void *)zratio, xyz_change_isometric_coodinate);
 		list = list->next;
 	}	
 }
@@ -213,31 +158,38 @@ float get_scale_point(t_vector p1, t_vector p2, t_vector p3)
 	img_width = fabsf(p1.x - p3.x);
 	img_height = fabsf(p2.y);
 
-	printf("img_width: %f\n", img_width);
-	printf("img_height: %f\n", img_height);
 	scale = WIDTH / img_width;
 	if (scale > HEIGHT / img_height)
 		scale = HEIGHT / img_height;
-	printf("scale: %f\n", scale);
-	return scale;
+	return scale * 0.6;
 }
 
-void move_vec (t_vector *** arr)
+void move_x (void * pvec, void * arg)
 {
-	t_idx	index;
+	t_vector * vec = pvec;
+	int * move_x = arg;
 
-	zero_vec(&index);
-	while (arr[index.y] != NULL)
-	{
-		index.x = 0;
-		while (arr[index.y][index.x] != NULL)
-		{
-			arr[index.y][index.x]->x += 0;
-			arr[index.y][index.x]->y += 0;
-			index.x++;
-		}
-		index.y++;
-	}
+	vec->x += *move_x;
+}
+
+void move_y (void * pvec, void * arg)
+{
+	t_vector * vec = pvec;
+	int * move_y = arg;
+
+	vec->y += *move_y;
+}
+
+void move_loop_x (void * lst, void * arg)
+{
+	t_list * list = lst;
+	ft_lstiter_arg(list, arg, move_x);
+}
+
+void move_loop_y (void * lst, void * arg)
+{
+	t_list * list = lst;
+	ft_lstiter_arg(list, arg, move_y);
 }
 
 void sv(void *pvec, void *arg)
@@ -255,48 +207,132 @@ void scale_loop(void *plst, void *arg)
 	ft_lstiter_arg(lst, arg, sv);
 }
 
+void vector_scaling_lst (t_init * init, float * scale)
+{
+	*scale = get_scale_point(*(t_vector *)(P1), *(t_vector *)(P2), *(t_vector *)(P3));
+	if (*scale > 30.0f)
+		*scale *= 0.6;
+	else
+		*scale *= 1.2;
+	ft_lstiter_arg(init->list, (void *)scale, scale_loop);
+}
+
+void vector_move_in_window (t_init * init)
+{
+	t_point move_xy;
+
+	move_xy.x = get_move_x_point(*(t_vector *)(P1), *(t_vector *)(P3));
+	ft_lstiter_arg(init->list, (void *)&move_xy.x, move_loop_x);
+	move_xy.y = get_move_y_point(*(t_vector *)(P2));
+	ft_lstiter_arg(init->list, (void *)&move_xy.y, move_loop_y);
+}
+
+void init_free_perror(t_init * init, char * str)
+{
+	double_lst_clear(init->list, content_del);
+	free(init->data);
+	free(init);
+	ft_perror(str);
+}
+void init_free(t_init * init)
+{
+	rec_free(init->map, 3);
+	free(init->data);
+	free(init);
+}
+
+void clean(t_init *init)
+{
+	mlx_destroy_image(init->mlx, init->data->img.mlx_img);
+	mlx_destroy_window(init->mlx, init->data->win_ptr);
+	init_free(init);
+}
+
+int close_window (int key, t_init * init)
+{
+	if (key == 53)
+	{
+		clean(init);
+	}
+	return 0;
+}
+
+int close_window_ondestroy(t_init * init)
+{
+	clean(init);
+	return 1;
+}
+
+void vector_setting_for_lender (t_init * init)
+{
+	float scale;
+	
+	vector_scaling_lst(init, &scale);
+	isometric_xyz(init->list, &scale);
+	vector_move_in_window(init);
+}
+
+/*
+ * This function will be called if the X button @ GUI window is pressed.
+ * This function should clearly kill everything and free every single memory
+ * @param init t_init struture that contains every nessery datas
+ */
+// int	test(void *init)
+// {
+// 	close_window(17, init);
+// 	return 1;
+// }
+
+void make_map_arry (t_init * init)
+{
+	init->map = lst_change_to_arr(init->list);
+	double_lst_clear(init->list, content_del);
+}
+
+typedef struct	s_vars {
+	void	*mlx;
+	void	*win;
+}				t_vars;
+
+int	close_mlx(int keycode, t_vars *vars)
+{
+	mlx_destroy_window(vars->mlx, vars->win);
+	return (0);
+}
+
 
 int main(int argc, char * argv[])
 {
-	t_init * init;
-	float scale;
+	// t_init * init;
 
-	if (argc_argv_check (argc, argv) == failed)
-	{
-		printf("argc argv error\n");
-		return 0;
-	}
-	init = all_init();
-	if (init == NULL)
-	{
-		printf("init error\n");
-		return 0;
-	}
-	if (fdf_map_check (init, argv[1]) == failed)
-	{
-		printf("input error\n");
-		return 0;
-	}
-	if (make_vector_list(init) == failed)
-	{
-		printf("vector error\n");
-		return 0;
-	}
-	scale = get_scale_point(*(t_vector *)(P1), *(t_vector *)(P2), *(t_vector *)(P3));
-	ft_lstiter_arg(init->list, (void *)&scale, scale_loop);
-	if (scale > 30.0f)
-	{
-		scale *= 0.6;
-		iso_lst(init->list, scale);
-	}
-	else
-		iso_lst(init->list, scale);
-	init->map = lst_change_to_arr(init->list);
-	draw_line(init->map, init->img);
-	// t_vector v1 = {0, 0, 0};
-	// t_vector v2 = {1920, 1080, 0};
-	// line_draw(init->img, &v1, &v2);
-	mlx_put_image_to_window(init->mlx, init->data->win_ptr, init->data->img.mlx_img, 0, 0);
-	mlx_loop(init->mlx);
-	rec_free(init->map, 3);
+	// atexit(check_leak);
+	// if (argc_argv_check (argc, argv) == failed)
+	// 	ft_perror("file error\n");
+	// init = all_init();
+	// if (init == NULL)
+	// 	ft_perror("error\n");
+	// if (fdf_map_check (init, argv[1]) == failed)
+	// 	init_free_perror(init, "map error\n");
+	// if (make_vector_list(init) == failed)
+	// 	init_free_perror(init, "error\n");
+	
+	// vector_setting_for_lender(init);
+	// make_map_arry(init);
+	
+	// draw_line(init->map, init->img);
+	
+	// mlx_put_image_to_window(init->mlx, init->data->win_ptr, init->data->img.mlx_img, 0, 0);
+	// mlx_key_hook(init->data->win_ptr, close_window, init);
+	// mlx_hook(init->data->win_ptr, 17, 0, close_window_ondestroy, init);
+	// mlx_loop(init->mlx);
+	// printf("end\n");
+	// init_free(init);
+	t_vars	vars;
+
+	vars.mlx = mlx_init();
+	vars.win = mlx_new_window(vars.mlx, 1920, 1080, "Hello world!");
+	mlx_hook(vars.win, 2, 1L<<0, close_mlx, &vars);
+	// mlx_hook(vars.win, 17, 0, close_window_ondestroy, NULL);
+	mlx_loop(vars.mlx);
+	return 0;
 }

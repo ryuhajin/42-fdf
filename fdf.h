@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fdf.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
+/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 15:17:11 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/28 01:03:57 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/28 18:26:14 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,7 @@ t_init * all_init (void);
 int fdf_map_check (t_init * init, char * file_name);
 int fdf_file_open (t_init * init, char * file_name);
 void remove_char_lst (void * list, void * c);
+void double_lst_clear (t_list * list, void (*del)(void *));
 
 //init2.c
 void content_del (void * content);
@@ -150,14 +151,14 @@ int argc_argv_check (int argc, char * argv[]);
 void ft_vector_swap (t_point *a, t_point *b);
 void img_pix_put (t_img * img, int x, int y);
 void line_draw(t_img * img, t_vector *v1, t_vector *v2);
-//void point_img_x_plus (t_vector * vec1, t_vector * vec2, t_img * img);
-void point_img_y_plus (t_vector * vec1, t_vector * vec2, t_img * img);
+void y_plus_pixel_put(t_point v1, t_point v2, t_img * img);
+void x_plus_pixel_put(t_point v1, t_point v2, t_img * img);
 void * make_vector_node (void * list);
 void set_vector_xy (void * list, void * vector);
 int make_vector_list(t_init * init);
 void xyz_change_isometric_coodinate (void * content, void * pfilter);
-
-void dda_to_br(t_point v1, t_point v2, t_img * img);
+int get_move_x_point (t_vector p1, t_vector p3);
+int get_move_y_point (t_vector p2);
 
 
 // print.c

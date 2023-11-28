@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   line.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
+/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 21:21:35 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/28 00:59:13 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/28 20:21:20 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,26 @@ void ft_vector_swap (t_point *a, t_point *b)
 	b->x = temp.x;
 	b->y = temp.y;
 }
+
+int get_move_x_point (t_vector p1, t_vector p3)
+{
+	int move;
+	
+	move = fabsf(p3.x);
+	move += (WIDTH - fabsf(p1.x - p3.x)) * 0.5;
+	printf("p1.x : %f p3.x: %f\n", p1.x, p3.x);
+	printf("move: %d\n", move);
+	return (move);
+}
+
+int get_move_y_point (t_vector p2)
+{
+	int move;
+	
+	move = (HEIGHT - fabsf(p2.y)) * 0.5;
+	return abs(move);
+}
+
 
 void img_pix_put (t_img * img, int x, int y)
 {
@@ -49,42 +69,16 @@ void line_draw(t_img * img, t_vector *v1, t_vector *v2)
 	p2.x = roundf(v2->x);
 	p2.y = roundf(v2->y);
 	if (del_x > del_y)
-		dda_to_br(p1, p2, img);
-		// point_img_x_plus(v1, v2, img);
-	// else
-	// 	point_img_y_plus(v1, v2, img);
+		x_plus_pixel_put(p1, p2, img);
+	else
+		y_plus_pixel_put(p1, p2, img);
 }
 
-// void point_img_x_plus (t_vector * vec1, t_vector * vec2, t_img * img)
-// {
-// 	t_vector p1;
-// 	t_vector p2;
-// 	float slope;
-// 	float origin_y;
 
-// 	p1.x = vec1->x;
-// 	p2.x = vec2->x;
-// 	p1.y = vec1->y;
-// 	p2.y = vec2->y;
-	
-// 	if (p1.x > p2.x)
-// 		ft_vector_swap(&p1, &p2);
-
-// 	slope = (float)(p2.y - p1.y) / (float)(p2.x - p1.x) * (p2.x - p1.x);
-// 	origin_y = (p1.y + slope / (p2.x - p1.x)) * (p2.x - p1.x);
-// 	while (p1.x <= p2.x)
-// 	{
-// 		img_pix_put(img, p1.x, p1.y);
-// 		p1.x += 1.0f;
-// 		origin_y += slope / (p2.x - p1.x);
-// 		p1.y = roundf(origin_y);
-// 	}
-// }
-// int x1, int y1, int x2, int y2, t_img *img
-void dda_to_br(t_point v1, t_point v2, t_img * img)
+void x_plus_pixel_put(t_point v1, t_point v2, t_img * img)
 {
-	int delta_y; // 실수 (나눗셈) >> * dx
 	int delta_x;
+	int delta_y; // 실수 (나눗셈) >> * dx
 	int sum_slope = 0;
 	int	unit_y;
 
@@ -108,53 +102,32 @@ void dda_to_br(t_point v1, t_point v2, t_img * img)
 	}
 }
 
-// void dda(const int x1, const int y1, const int x2, const int y2)
-// {
-// 	int px = x1;
-// 	int py = y1;
-// 	float slope = (y2 - y1) / (x2 - x1); // 실수 (나눗셈) >> * dx
-// 	float sum_slope = 0.0f;
+void y_plus_pixel_put(t_point v1, t_point v2, t_img * img)
+{
+	int delta_x; // 실수 (나눗셈) >> * dx
+	int delta_y;
+	int sum_slope = 0;
+	int	unit_x;
 
-// 	while (px <= x2)
-// 	{
-// 		// draw_point(px, py);
-// 		// x
-// 		px += 1;
-// 		// y
-// 		sum_slope += slope;
-// 		if (sum_slope > 0.5) // 1/2 (나눗셈) >> * 2
-// 		{
-// 			sum_slope -= 1.0f;
-// 			py += 1;
-// 		}
-// 	}
-// }
-
-// void point_img_y_plus (t_vector * vec1, t_vector * vec2, t_img * img)
-// {
-// 	return;
-// 	t_vector p1;
-// 	t_vector p2;
-// 	float slope;
-// 	float origin_x;
-
-// 	p1.x = vec1->x;
-// 	p2.x = vec2->x;
-// 	p1.y = vec1->y;
-// 	p2.y = vec2->y;
-
-// 	if (p1.y > p2.y)
-// 		ft_vector_swap(&p1, &p2);
-// 	slope = (float)(p2.x - p1.x) / (float)(p2.y - p1.y);
-// 	origin_x = p1.x + slope;
-// 	while (p1.y < p2.y - 1.0f)
-// 	{
-// 		img_pix_put(img, p1.x, p1.y);
-// 		p1.y++;
-// 		origin_x += slope;
-// 		p1.x = roundf(origin_x);
-// 	}
-// }
+	if (v1.y > v2.y)
+		ft_vector_swap(&v1, &v2);
+	unit_x = 1;
+	if (v1.x > v2.x)
+		unit_x = -1;
+	delta_y = abs(v2.y - v1.y);
+	delta_x = abs(v2.x - v1.x);
+	while (v1.y < v2.y)
+	{
+		v1.y += 1;
+		sum_slope += delta_x;
+		if (sum_slope * 2 > delta_y) // 1/2 (나눗셈) >> * 2
+		{
+			sum_slope -= delta_y;
+			v1.x += unit_x;
+		}
+		img_pix_put(img, v1.x, v1.y);
+	}
+}
 
 void * make_vector_node (void * list) //map에서 list->content를 넘겨준다. (즉 list 행을 넘겨줌)
 {
@@ -171,7 +144,6 @@ void * make_vector_node (void * list) //map에서 list->content를 넘겨준다.
 		if (vector == NULL)
 			return NULL;
 		vector->z = *(int *)node->content;
-		printf("vector: %f %f %f\n", vector->x, vector->y, vector->z);
 		new_node = ft_lstnew(vector);
 		if (new_node == NULL)
 			return NULL;
@@ -213,11 +185,10 @@ int make_vector_list(t_init * init)
         return failed;
     else
     {
-        ft_lstclear(&init->list, content_del);
+        double_lst_clear(init->list, content_del);
         init->list = new_node;
     }
 	ft_lstiter_arg(init->list, (void *)&vector, set_vector_xy);
-	ft_lstiter(init->list, print_lst_map);
 	return success;
 }
 
@@ -231,21 +202,4 @@ void xyz_change_isometric_coodinate (void * content, void * zratio)
 
 	point->x = (COS_30 * (x - y));
 	point->y = ((0.5 * (x + y)) - (z * ratio));
-
-	/* 
-	내가 해야할 것
-	1. 파싱한 맵을 x,y,z 좌표로 lstmap을 사용하여 vector 만들기
-	2. 릭 체크하기
-	*/
-
-	/*
-	{ A, B }
-	basis[0] = A
-	basis[1] = B
-	{ {COS_30, 0.5}, {-COS_30, 0.5} }
-	{COS_30, 0.5}
-	basis[0][0] = COS_30 
-	(const 자료형) * = (자료형 const)* (자료가 불변이다)
-	(자료형) * const (포인터가 불변이다)
-	*/
 }

@@ -6,7 +6,7 @@
 /*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/13 19:17:49 by dayou             #+#    #+#             */
-/*   Updated: 2023/11/26 18:04:30 by dayou            ###   ########.fr       */
+/*   Updated: 2023/11/28 19:29:19 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,40 @@ void	ft_perror(const char *str)
 	len = ft_strlen(str);
 	write(2, str, len);
     return exit(1);
+}
+
+void	ft_lstclear(t_list **lst, void (*del)(void *))
+{
+	t_list	*iter;
+	t_list *temp;
+
+	if (*lst == NULL)
+		return ;
+	iter = *lst;
+	while (iter != NULL)
+	{
+		temp = iter;
+		iter = iter->next;
+		ft_lstdelone(temp, del);
+	}
+	*lst = NULL;
+}
+
+
+void double_lst_clear (t_list * list, void (*del)(void *))
+{
+	t_list * temp;
+	
+	if (list == NULL)
+		return;
+	while (list != NULL)
+	{
+		ft_lstclear((t_list **)&list->content, del);
+		temp = list;
+		list = list->next;
+		ft_lstdelone(temp, content_del);
+	}
+	list = NULL;
 }
 
 void	ft_lstiter_arg(t_list *lst,  void * arg, void (*f)(void *, void *))
@@ -104,7 +138,7 @@ int fdf_map_check (t_init * init, char * file_name)
         return failed;
     else
     {
-        ft_lstclear(&init->list, content_del);
+        ft_lstclear(&init->list, content_del); // line 지우기
         init->list = new_node;
     }
 	if (lst_column_check(init->list) == failed)
@@ -115,6 +149,5 @@ int fdf_map_check (t_init * init, char * file_name)
     if (lst_true_false_check(init->list, int_min_max_check) == failed)
         return failed;
 	ft_lstiter(init->list, lst_atoi);
-	ft_lstiter(init->list, print_lst_in_int);
 	return success;
 }
