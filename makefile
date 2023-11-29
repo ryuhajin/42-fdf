@@ -1,11 +1,14 @@
 CC = cc
 
 # SANITIZE = -fsanitize=address
-# CFLAG = -Wall -Werror -Wextra -g $(SANITIZE)
+CFLAG = -Wall -Werror -Wextra -g $(SANITIZE)
 
 NAME = fdf
 
-SRCS = main_test.c init.c init2.c input.c line.c print.c read_line.c read_line2.c
+SRCS = main_test.c free.c init.c init2.c input.c \
+	isometric.c line.c map_check.c map_check2.c map.c \
+	move.c mlx_event.c print.c read_line.c read_line2.c \
+	scale.c utils.c utils2.c
 
 OBJS = $(SRCS:.c=.o)
 
