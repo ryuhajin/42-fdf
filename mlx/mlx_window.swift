@@ -415,11 +415,11 @@ public class MlxWin
 	}
   }
 
-  public func putImage(image img:MlxImg, x posx:Int32, y posy:Int32)
+  public func putImage(image img:MlxImg, x player_x:Int32, y player_y:Int32)
   {
 	flushPixels()
 	putImageScale(image:img, sx:0, sy:0, sw:Int32(img.texture_width), sh:Int32(img.texture_height), 
-			   dx:posx, dy:posy, dw:Int32(img.texture_width), dh:Int32(img.texture_height),
+			   dx:player_x, dy:player_y, dw:Int32(img.texture_width), dh:Int32(img.texture_height),
 			   c:UInt32(0xFFFFFFFF))
   }
 
